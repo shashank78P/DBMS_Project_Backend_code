@@ -8,6 +8,7 @@ const { urlencoded } = require("body-parser");
 const axios = require("axios");
 const { response } = require("express");
 const e = require("express");
+require('dotenv').config();
 
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(express.json())
@@ -22,10 +23,10 @@ app.use(fileUpload())
 // });
 // host: "jdbc:mysql://sql2.freesqldatabase.com:3306/sql12661053",
 const db = mysql.createConnection({
-    host: "sql12.freesqldatabase.com",
-    user: "sql12661053",
-    database: "sql12661053",
-    password: "fyQMeJU5me"
+    host: process.env.HOST,
+    user: process.env.USER,
+    database: process.env.DATABASE,
+    password: process.env.PASSWORD
 });
 
 db.connect((err) => {
