@@ -14,16 +14,23 @@ app.use(express.json())
 app.use(cors())
 app.use(fileUpload())
 
+// const db = mysql.createConnection({
+//     host: "127.0.0.1",
+//     user: "root",
+//     database: "tutorial_mng_sys",
+//     password: "password123"
+// });
+// host: "jdbc:mysql://sql2.freesqldatabase.com:3306/sql12661053",
 const db = mysql.createConnection({
-    host: "127.0.0.1",
-    user: "root",
-    database: "tutorial_mng_sys",
-    password: "password123"
+    host: "sql12.freesqldatabase.com",
+    user: "sql12661053",
+    database: "sql12661053",
+    password: "fyQMeJU5me"
 });
 
 db.connect((err) => {
     if (err) {
-        throw err;
+        console.log(err);
     }
     else {
         console.log("connected");
@@ -33,7 +40,7 @@ db.connect((err) => {
 
 const getAllDetails = async (req, res) => {
     try {
-        const student_details = await db.query("select * from students;",
+        const student_details = await db?.query("select * from students;",
             (err, resut) => {
                 if (err) throw err;
                 else {
@@ -45,13 +52,33 @@ const getAllDetails = async (req, res) => {
         console.log(error);
     }
 }
+// function call(){
+//     const x = async(req,res)=>{
+//         try{
+//             db?.query("select * from students;",(err,result)=>{
+//                 if(err) throw err;
+//                 console.log(result);
+//                 x=result;
+//             })
+//         }catch(error){
+//             console.log(error)
+//         }
+//     } 
 
-let baseurl = "http://localhost:3000/";
+// }
+// call()
+// let baseurl = "https://quiet-springs-47127.herokuapp.com/productServer";
+// let baseurl = "http://localhost:3000/";
 app.get("/", (req, res) => {
     console.log("query");
     res.send("Server started");
 })
 
+
+app.post("/post", (req, res) => {
+    console.log("post", req.body);
+    res.send("done")
+})
 
 app.get("/get", (req, res) => {
     const body = req.body;
@@ -67,7 +94,7 @@ app.post("/login", (req, res) => {
         const user_name = req.body.user_name;
         const password = req.body.password;
 
-        db.query(
+        db?.query(
             "select name,password from " + role + " where name = ? and password=?", [user_name, password], (err, result) => {
                 if (err) throw err;
                 if (result.length > 0) {
@@ -86,7 +113,7 @@ app.post("/login", (req, res) => {
 app.get("/api/parent/", (req, res) => {
     try {
 
-        db.query("select * from parents;", (err, result) => {
+        db?.query("select * from parents;", (err, result) => {
             if (err) throw err;
             console.log(result);
             res.send({ name: result });
@@ -99,7 +126,7 @@ app.get("/api/parent/", (req, res) => {
 app.get("/api/student/", (req, res) => {
     try {
 
-        db.query("select * from students;", (err, result) => {
+        db?.query("select * from students;", (err, result) => {
             if (err) throw err;
             // console.log(result);
             res.send({ name: result });
@@ -111,7 +138,7 @@ app.get("/api/student/", (req, res) => {
 app.get("/api/teacher", (req, res) => {
     try {
 
-        db.query("select * from teachers;", (err, result) => {
+        db?.query("select * from teachers;", (err, result) => {
             if (err) throw err;
             // console.log(result);
             res.send({ name: result });
@@ -123,7 +150,7 @@ app.get("/api/teacher", (req, res) => {
 app.get("/api/admin", (req, res) => {
     try {
 
-        db.query("select * from admin;", (err, result) => {
+        db?.query("select * from admin;", (err, result) => {
             if (err) throw err;
             // console.log(result);
             res.send({ name: result });
@@ -136,9 +163,9 @@ app.get("/api/admin", (req, res) => {
 app.get("/api/fee", (req, res) => {
     try {
         console.log("called")
-        // let d= new Date()
-        // let date = d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()
-        db.query('CALL getStudents();', (err, result) => {
+        let d= new Date()
+        let date = d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()
+        db?.query('SELECT f.fid, f.sid, s.name, f.batch, f.total_fee, f.fee_balance, f.deadline FROM fee f, students s WHERE f.fee_balance <> 0 AND s.sid = f.sid;', (err, result) => {
             if (err) throw err;
             console.log(result);
             res.send(result);
@@ -153,7 +180,7 @@ app.post("/deleted", (req, res) => {
 
         console.log(req.body);
         if (req.body.table === "teacher") {
-            db.query("delete from teachers where tid=?", req.body.id, (err, result) => {
+            db?.query("delete from teachers where tid=?", req.body.id, (err, result) => {
                 if (err) {
                     console.log(err);
                 }
@@ -165,7 +192,7 @@ app.post("/deleted", (req, res) => {
 
         }
         if (req.body.table === "student") {
-            db.query("delete from students where sid=?", req.body.id, (err, result) => {
+            db?.query("delete from students where sid=?", req.body.id, (err, result) => {
                 if (err) {
                     console.log(err);
                     res.send("Record Not Deleted!!!");
@@ -178,7 +205,7 @@ app.post("/deleted", (req, res) => {
 
         }
         if (req.body.table === "admin") {
-            db.query("delete from admin where aid=?", req.body.id, (err, result) => {
+            db?.query("delete from admin where aid=?", req.body.id, (err, result) => {
                 if (err) {
                     console.log(err);
                     res.send("Record Not Deleted!!!");
@@ -222,7 +249,7 @@ app.post("/edit", (req, res) => {
         const email = req.body.email;
         console.log(req.body, table, id);
         if (table === 'admin') {
-            db.query("update admin set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where aid=?",
+            db?.query("update admin set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where aid=?",
                 [name, address, email, phone, DOB, lname, id], (error, result) => {
                     if (error) {
                         console.log(error)
@@ -234,7 +261,7 @@ app.post("/edit", (req, res) => {
         }
         if (table == 'teacher') {
             console.log("teacher is called", table)
-            db.query("update teachers set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where tid=?",
+            db?.query("update teachers set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where tid=?",
                 [name, address, email, phone, DOB, lname, id], (error, result) => {
                     if (error) {
                         console.log(error)
@@ -245,7 +272,7 @@ app.post("/edit", (req, res) => {
                 })
         }
         else {
-            db.query(`update students set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where sid=?`,
+            db?.query(`update students set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where sid=?`,
                 [name, address, email, phone, DOB, lname, id], (error, result) => {
                     console.log("student is called", table)
                     if (error) {
@@ -268,12 +295,12 @@ app.post("/fee/edit", (req, res) => {
         let id_var;
         console.log("edit is called", req.body)
         const table = (req.body.table);
-        
+
         // const id = req.body.id;
         // const date = req.body.id;
         // console.log(req.body, table, id);
         //     console.log("teacher is called", table)
-        //     db.query("update teachers set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where tid=?",
+        //     db?.query("update teachers set name = ? , address = ? , email = ? ,phone = ?, DOB = ? , lname = ? where tid=?",
         //         [name, address, email, phone, DOB, lname, id], (error, result) => {
         //             if (error) {
         //                 console.log(error)
@@ -294,7 +321,7 @@ app.post("/update", (req, res) => {
         console.log("dfhdfkudhefuieh", req.body);
         if (res) {
             if (req.body.table == "student") {
-                db.query("UPDATE students SET name=?, lname=?,DOB=?,address=? , phone = ?,email=? WHERE (sid = ?)",
+                db?.query("UPDATE students SET name=?, lname=?,DOB=?,address=? , phone = ?,email=? WHERE (sid = ?)",
                     [req.body.updating_data.name, req.body.updating_data.lname, req.body.updating_data.DOB, req.body.updating_data.address,
                     req.body.updating_data.phone, req.body.updating_data.email, req.body.id],
                     (err, result) => {
@@ -307,7 +334,7 @@ app.post("/update", (req, res) => {
                     })
             }
             if (req.body.table == "teacher") {
-                db.query("UPDATE teachers SET name=?, lname=?,DOB=?,address=? , phone = ?,email=? WHERE (tid = ?)",
+                db?.query("UPDATE teachers SET name=?, lname=?,DOB=?,address=? , phone = ?,email=? WHERE (tid = ?)",
                     [req.body.updating_data.name, req.body.updating_data.lname, req.body.updating_data.DOB, req.body.updating_data.address,
                     req.body.updating_data.phone, req.body.updating_data.email, req.body.id],
                     (err, result) => {
@@ -320,7 +347,7 @@ app.post("/update", (req, res) => {
                     })
             }
             if (req.body.table == "admin") {
-                db.query("UPDATE admin SET name=?, lname=?,DOB=?,address=? , phone = ?,email=? WHERE (aid = ?)",
+                db?.query("UPDATE admin SET name=?, lname=?,DOB=?,address=? , phone = ?,email=? WHERE (aid = ?)",
                     [req.body.updating_data.name, req.body.updating_data.lname, req.body.updating_data.DOB, req.body.updating_data.address,
                     req.body.updating_data.phone, req.body.updating_data.email, req.body.id],
                     (err, result) => {
@@ -349,7 +376,7 @@ app.post("/getById", (req, res) => {
 
         console.log("first or entered");
         if (req.body.table == "student") {
-            db.query("select * from students where sid=?", [req.body.id], (error, result) => {
+            db?.query("select * from students where sid=?", [req.body.id], (error, result) => {
                 if (error) {
                     console.log(error)
                     res.send(error)
@@ -362,7 +389,7 @@ app.post("/getById", (req, res) => {
             })
         }
         if (req.body.table == "teacher") {
-            db.query("select * from teachers where tid=?", [req.body.id], (error, result) => {
+            db?.query("select * from teachers where tid=?", [req.body.id], (error, result) => {
                 if (error) {
                     console.log(error)
                     res.send(error)
@@ -375,7 +402,7 @@ app.post("/getById", (req, res) => {
             })
         }
         if (req.body.table == "admin") {
-            db.query("select * from admin where aid=?", [req.body.id], (error, result) => {
+            db?.query("select * from admin where aid=?", [req.body.id], (error, result) => {
                 if (error) {
                     console.log(error)
                     res.send(error)
@@ -398,190 +425,192 @@ app.post("/getById", (req, res) => {
 
 
 app.post("/insert", (req, res) => {
-    try{
+    try {
         console.log(req.body.table)
         if (req) {
             let x;
             console.log(req.body.role.role)
             if (req.body.role.role === "parent") {
                 console.log(req.body.formData.sid);
-                db.query("INSERT INTO parents (PID,FATHER_NAME, MOTHER_NAME, FATHER_PHONE, MOTHER_PHONE, PARENT_EMAIL, STUD_ID) VALUES (?,?,?,?,?,?,?);",
-                [req.body.formData.pid, req.body.formData.fatherName, req.body.formData.motherName, req.body.formData.fatherPhone, req.body.formData.MotherPhone, req.body.formData.parentEmail, req.body.formData.sid]
-                , (error, result) => {
-                    if (error) {
-                        console.log(error);
-                        res.send({ msg: error.sqlMessage, status: false });
+                db?.query("INSERT INTO parents (PID,FATHER_NAME, MOTHER_NAME, FATHER_PHONE, MOTHER_PHONE, PARENT_EMAIL, STUD_ID) VALUES (?,?,?,?,?,?,?);",
+                    [req.body.formData.pid, req.body.formData.fatherName, req.body.formData.motherName, req.body.formData.fatherPhone, req.body.formData.MotherPhone, req.body.formData.parentEmail, req.body.formData.sid]
+                    , (error, result) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ msg: error.sqlMessage, status: false });
+                        }
+                        else {
+                            console.log("result", result);
+                            res.send({ msg: "Sucessfully Submited !!!!", status: true });
+                        }
                     }
-                    else {
-                        console.log("result", result);
-                        res.send({ msg: "Sucessfully Submited !!!!", status: true });
-                    }
-                }
                 )
-        }
-        if (req.body.role.role === "other") {
-            console.log(req.body.formData.sid);
-            db.query("INSERT INTO fee (fid, parent_income, batch, total_fee, fee_paid, fee_balance, deadline, sid, par_id) VALUES (?,?,?,?,?,?,?,?,?);",
-            [req.body.formData.fid, req.body.formData.parentIncome, req.body.formData.batch, req.body.formData.totalFee, req.body.formData.PaidFee, (req.body.formData.totalFee - req.body.formData.PaidFee), req.body.formData.deadline_pay, req.body.formData.sid, req.body.formData.pid]
-            , (error, result) => {
-                if (error) {
-                    console.log(error);
-                    res.send({ msg: error.sqlMessage, status: false });
-                }
-                    else {
-                        console.log("result", result);
-                        res.send({ msg: "Sucessfully Submited !!!!", status: true });
-                    }
-                }
-                
-                )
-        }
-        if(req.body.role.role === "student") {
-            db.query("INSERT INTO students (sid,name,lname,DOB,address,email,phone,password) VALUES (?,?, ?, ?, ?, ?, ?, ?);",
-            [req.body.formData.sid, req.body.formData.name, req.body.formData.lname, req.body.formData.DOB, req.body.formData.address, req.body.formData.email, req.body.formData.phone, req.body.formData.password],
-            (error, result) => {
-                if (error) {
-                    console.log(error);
-                    res.send({ msg: error.sqlMessage, status: false });
-                }
-                else {
-                        console.log(result);
-                        res.send({ msg: "Sucessfully Submited !!!!", status: true })
-                    }
-                })
             }
+            if (req.body.role.role === "other") {
+                console.log(req.body.formData.sid);
+                db?.query("INSERT INTO fee (fid, parent_income, batch, total_fee, fee_paid, fee_balance, deadline, sid, par_id) VALUES (?,?,?,?,?,?,?,?,?);",
+                    [req.body.formData.fid, req.body.formData.parentIncome, req.body.formData.batch, req.body.formData.totalFee, req.body.formData.PaidFee, (req.body.formData.totalFee - req.body.formData.PaidFee), req.body.formData.deadline_pay, req.body.formData.sid, req.body.formData.pid]
+                    , (error, result) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ msg: error.sqlMessage, status: false });
+                        }
+                        else {
+                            console.log("result", result);
+                            res.send({ msg: "Sucessfully Submited !!!!", status: true });
+                        }
+                    }
+
+                )
+            }
+            if (req.body.role.role === "student") {
+                db?.query("INSERT INTO students (sid,name,lname,DOB,address,email,phone,password) VALUES (?,?, ?, ?, ?, ?, ?, ?);",
+                    [req.body.formData.sid, req.body.formData.name, req.body.formData.lname, req.body.formData.DOB, req.body.formData.address, req.body.formData.email, req.body.formData.phone, req.body.formData.password],
+                    (error, result) => {
+                        if (error) {
+                            console.log(error);
+                            res.send({ msg: error.sqlMessage, status: false });
+                        }
+                        else {
+                            console.log(result);
+                            res.send({ msg: "Sucessfully Submited !!!!", status: true })
+                        }
+                    })
+            }
+        }
+        else {
+            console.log(res);
+        }
     }
-    else {
-        console.log(res);
+    catch (error) {
+        console.log(error)
     }
-}
-catch(error){
-    console.log(error)
-}
 })
 
 app.post("/adds/teacheroradmin", (req, res) => {
-    try{
+    try {
 
         console.log(req.body.details.id, req.body.table);
         if (req.body.table == "teacher") {
-            db.query('INSERT INTO teachers VALUES (?,?,?,?,?,?,?,?);',
-            [req.body.details.id, req.body.details.name, req.body.details.password, req.body.details.address, req.body.details.email, req.body.details.phone, req.body.details.DOB, req.body.details.lname],
-            (error, result) => {
-                if (result) {
-                    console.log(result);
-                    res.send({ msg: "Sucessfully inserted !!!!", status: true });
-                }
-                else {
-                    console.log(error.sqlMessage)
-                    res.send({ msg: error.sqlMessage, status: false });
-                }
-            })
-            
+            // console.lo);
+            db?.query('INSERT INTO teachers (tid,name,password,address,email,phone,DOB,lname,aid) VALUES (?,?,?,?,?,?,?,?,?);',
+                [req.body.details.id, req.body.details.name, req.body.details.password, req.body.details.address, req.body.details.email, req.body.details.phone, req.body.details.DOB, req.body.details.lname, 1],
+                (error, result) => {
+                    if (result) {
+                        console.log(result);
+                        res.send({ msg: "Sucessfully inserted !!!!", status: true });
+                    }
+                    else {
+                        console.log(error)
+                        console.log()
+                        res.send({ msg: error.sqlMessage, status: false });
+                    }
+                })
+
         }
         if (req.body.table == "admin") {
-            db.query('INSERT INTO admin VALUES (?,?,?,?,?,?,?,?);',
-            [req.body.details.id, req.body.details.name, req.body.details.lname, req.body.details.email, req.body.details.phone, req.body.details.DOB, req.body.details.address, req.body.details.password],
-            (error, result) => {
-                if (result) {
-                    console.log(result);
-                    res.send({ msg: "Sucessfully inserted !!!!", status: true });
-                }
-                else {
-                    console.log(error.sqlMessage)
-                    res.send({ msg: error.sqlMessage, status: false });
-                }
-            })
-            
+            db?.query('INSERT INTO admin (aid , name , lname , email, phone , DOB , address , password) VALUES (?,?,?,?,?,?,?,?);',
+                [req.body.details.id, req.body.details.name, req.body.details.lname, req.body.details.email, req.body.details.phone, req.body.details.DOB, req.body.details.address, req.body.details.password],
+                (error, result) => {
+                    if (result) {
+                        console.log(result);
+                        res.send({ msg: "Sucessfully inserted !!!!", status: true });
+                    }
+                    else {
+                        console.log(error.sqlMessage)
+                        res.send({ msg: error.sqlMessage, status: false });
+                    }
+                })
+
         }
     }
-    catch(error){
+    catch (error) {
         console.log(error)
     }
-    })
-    
-app.post("/update/fee",(req,res)=>{
-    try{
-        console.log("requested",req.body);
-        db.query("UPDATE fee SET fee_balance = ?, deadline = ?,fee_paid = ? WHERE (fid = ?);",
-        [req.body.fee_to_pay,req.body.deadline,req.body.paid,req.body.id]
-        ,(error,result)=>{
-            if(result){
-                res.send({status:true,msg:"Sucessfully Updated"});
-                console.log(result);
-            }
-            else{
-                res.send({status:false,msg:error.sqlMessage});
-                console.log(error);
-            }
-        })
+})
+
+app.post("/update/fee", (req, res) => {
+    try {
+        console.log("requested", req.body);
+        db?.query("UPDATE fee SET fee_balance = ?, deadline = ?,fee_paid = ? WHERE (fid = ?);",
+            [req.body.fee_to_pay, req.body.deadline, req.body.paid, req.body.id]
+            , (error, result) => {
+                if (result) {
+                    res.send({ status: true, msg: "Sucessfully Updated" });
+                    console.log(result);
+                }
+                else {
+                    res.send({ status: false, msg: error.sqlMessage });
+                    console.log(error);
+                }
+            })
     }
-    catch(err){
+    catch (err) {
 
     }
 })
-    
-app.post("/Students_details",(req,res)=>{
-    try{
-        if(req){
+
+app.post("/Students_details", (req, res) => {
+    try {
+        if (req) {
             console.log(req.body)
-            db.query("SELECT * FROM fee as f, students s,parents p where s.sid=? and f.sid=s.sid and s.sid=p.stud_id;",[req.body.id],(error,result)=>{
-                if(result){
+            db?.query("SELECT * FROM fee as f, students s,parents p where s.sid=? and f.sid=s.sid and s.sid=p.stud_id;", [req.body.id], (error, result) => {
+                if (result) {
                     console.log(result);
                     res.send(result)
                 }
-                else{
+                else {
                     console.log(error)
                 }
             })
         }
-        else{
+        else {
             console.log(err)
         }
     }
-    catch(err){
+    catch (err) {
 
     }
 })
 
-   
-app.post("/add_class",(req,res)=>{
-    try{
-        if(req){
+
+app.post("/add_class", (req, res) => {
+    try {
+        if (req) {
             console.log(req.body)
-            db.query('INSERT INTO class (cdate, ctime, room_no, tid, cEndTime,subject,description) VALUES (?,?,?,?,?,?,?);',
-            [req.body.date,req.body.start_time,req.body.room_no,req.body.id,req.body.end_time,req.body.subject,req.body.description],
-            (error,result)=>{
-                if(error){
-                    console.log(error)
-                    res.send({msg:"not sucessfull"});
-            }
-            else{
-                console.log(result);
-                res.send({msg:"sucessfull"});
-            }
-        })
-    }
-    }catch(error){
+            db?.query('INSERT INTO class (cdate, ctime, room_no, tid, cEndTime,subject,description) VALUES (?,?,?,?,?,?,?);',
+                [req.body.date, req.body.start_time, req.body.room_no, req.body.id, req.body.end_time, req.body.subject, req.body.description],
+                (error, result) => {
+                    if (error) {
+                        console.log(error)
+                        res.send({ msg: "not sucessfull" });
+                    }
+                    else {
+                        console.log(result);
+                        res.send({ msg: "sucessfull" });
+                    }
+                })
+        }
+    } catch (error) {
         console.log(error)
     }
 })
 
-app.post("/get_message",(req,res)=>{
-    if(req){
+app.post("/get_message", (req, res) => {
+    if (req) {
         console.log(req.body.id);
-        db.query("SELECT cdate,ctime,cdate,room_no,cEndTime,subject,description FROM tutorial_mng_sys.teachers as t , tutorial_mng_sys.class as c where c.tid=? and t.tid=? and t.password = ? order by cdate desc;",
-        [req.body.id,req.body.id,req.body.password],
-        (error,result)=>{
-            if(error){
-                console.log(error)
-                res.send("No Message")
-            }
-            else{
-                console.log(result)
-                res.send(result);
-            }
-        })
+        db?.query("SELECT cdate,ctime,cdate,room_no,cEndTime,subject,description FROM teachers as t , class as c where c.tid=? and t.tid=? and t.password = ? order by cdate asc;",
+            [req.body.id, req.body.id, req.body.password],
+            (error, result) => {
+                if (error) {
+                    console.log(error)
+                    res.send("No Message")
+                }
+                else {
+                    console.log(result)
+                    res.send(result);
+                }
+            })
     }
 })
 
