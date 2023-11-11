@@ -43,7 +43,10 @@ const getAllDetails = async (req, res) => {
     try {
         const student_details = await db?.query("select * from students;",
             (err, resut) => {
-                if (err) throw err;
+                if (err) {
+console.log(err);
+return;
+}
                 else {
                     console.log(result);
                 }
@@ -57,7 +60,6 @@ const getAllDetails = async (req, res) => {
 //     const x = async(req,res)=>{
 //         try{
 //             db?.query("select * from students;",(err,result)=>{
-//                 if(err) throw err;
 //                 console.log(result);
 //                 x=result;
 //             })
@@ -97,7 +99,10 @@ app.post("/login", (req, res) => {
 
         db?.query(
             "select name,password from " + role + " where name = ? and password=?", [user_name, password], (err, result) => {
-                if (err) throw err;
+                if (err) {
+console.log(err);
+return;
+}
                 if (result.length > 0) {
                     res.send({ message: "true" });
                 }
@@ -115,7 +120,10 @@ app.get("/api/parent/", (req, res) => {
     try {
 
         db?.query("select * from parents;", (err, result) => {
-            if (err) throw err;
+            if (err) {
+console.log(err);
+return;
+}
             console.log(result);
             res.send({ name: result });
         })
@@ -128,7 +136,10 @@ app.get("/api/student/", (req, res) => {
     try {
 
         db?.query("select * from students;", (err, result) => {
-            if (err) throw err;
+            if (err) {
+console.log(err);
+return;
+}
             // console.log(result);
             res.send({ name: result });
         })
@@ -140,7 +151,10 @@ app.get("/api/teacher", (req, res) => {
     try {
 
         db?.query("select * from teachers;", (err, result) => {
-            if (err) throw err;
+            if (err) {
+console.log(err);
+return;
+}
             // console.log(result);
             res.send({ name: result });
         })
@@ -152,7 +166,10 @@ app.get("/api/admin", (req, res) => {
     try {
 
         db?.query("select * from admin;", (err, result) => {
-            if (err) throw err;
+            if (err) {
+console.log(err);
+return;
+}
             // console.log(result);
             res.send({ name: result });
         })
@@ -167,7 +184,10 @@ app.get("/api/fee", (req, res) => {
         let d= new Date()
         let date = d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate()
         db?.query('SELECT f.fid, f.sid, s.name, f.batch, f.total_fee, f.fee_balance, f.deadline FROM fee f, students s WHERE f.fee_balance <> 0 AND s.sid = f.sid;', (err, result) => {
-            if (err) throw err;
+            if (err) {
+console.log(err);
+return;
+}
             console.log(result);
             res.send(result);
         })
