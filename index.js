@@ -45,22 +45,7 @@ const getAllDetails = async (req, res) => {
         console.log(error);
     }
 }
-// function call(){
-//     const x = async(req,res)=>{
-//         try{
-//             db.query("select * from students;",(err,result)=>{
-//                 if(err) throw err;
-//                 console.log(result);
-//                 x=result;
-//             })
-//         }catch(error){
-//             console.log(error)
-//         }
-//     } 
 
-// }
-// call()
-// let baseurl = "https://quiet-springs-47127.herokuapp.com/productServer";
 let baseurl = "http://localhost:3000/";
 app.get("/", (req, res) => {
     console.log("query");
